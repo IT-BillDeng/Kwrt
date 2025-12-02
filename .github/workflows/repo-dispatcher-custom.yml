@@ -20,6 +20,10 @@ on:
         description: 'parameter'
         required: false
         default: ''
+      runner:
+        description: 'runner JSON（例如 ["self-hosted","kwrt"] 或 "ubuntu-latest"）'
+        required: false
+        default: '["self-hosted","kwrt"]'
 
 env:
   TOKEN_KIDDIN9: ${{ secrets.TOKEN_KIDDIN9 }}
@@ -27,7 +31,8 @@ env:
 
 jobs:
   build:
-    runs-on: [self-hosted, kwrt]
+    runs-on: ${{ github.event.inputs.runner && fromJson(github.event.inputs.runner) || '["ubuntu-latest"]' }}
+
     steps:
     - name: Checkout
       uses: actions/checkout@main
@@ -62,11 +67,14 @@ jobs:
 
     - name: Trigger Compile
       run: |
-        sudo timedatectl set-timezone "$TZ" || echo "timedatectl failed (no systemd), ignore"
-          curl \
-          -X POST https://api.github.com/repos/${{ github.repository }}/dispatches \
-          -H "Accept: application/vnd.github.everest-preview+json" \
-          -H "Authorization: token ${{ secrets.TOKEN_KIDDIN9 }}" \
-          -d '{"event_type": "x86_64_cuntom ${{ github.event.inputs.param }}", "client_payload": {"target": "x86_64"}}'
+        payload=$(jq -nc \
+          --arg param "${{ github.event.inputs.param }}" \
+          --argjson runner '${{ github.event.inputs.runner }}' \
+          '{event_type:"x86_64_custom", client_payload:{target:"x86_64_custom", param:$param, runner:$runner}}')
+        curl \
+        -X POST https://api.github.com/repos/${{ github.repository }}/dispatches \
+        -H "Accept: application/vnd.github.everest-preview+json" \
+        -H "Authorization: token ${{ secrets.TOKEN_KIDDIN9 }}" \
+        -d "$payload"
 
           
