@@ -6,7 +6,7 @@
 # Blog: https://p3terx.com
 #=================================================
 
-name: Repo Dispatcher
+name: Repo Dispatcher Custom
 
 on: 
   # push: 
@@ -62,7 +62,7 @@ jobs:
 
     - name: Trigger Compile
       run: |
-        sudo timedatectl set-timezone "$TZ"
+        sudo timedatectl set-timezone "$TZ" || echo "timedatectl failed (no systemd), ignore"
           curl \
           -X POST https://api.github.com/repos/${{ github.repository }}/dispatches \
           -H "Accept: application/vnd.github.everest-preview+json" \
