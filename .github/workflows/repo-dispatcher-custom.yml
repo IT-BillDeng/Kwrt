@@ -21,9 +21,9 @@ on:
         required: false
         default: ''
       runner:
-        description: 'runner JSON（例如 ["self-hosted","kwrt"] 或 "ubuntu-latest"）'
+        description: 'runner JSON (e.g.) ["self-hosted","kwrt"] or "ubuntu-latest"'
         required: false
-        default: '["self-hosted","kwrt"]'
+        default: '["ubuntu-latest"]'
 
 env:
   TOKEN_KIDDIN9: ${{ secrets.TOKEN_KIDDIN9 }}
